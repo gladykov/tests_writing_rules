@@ -4,22 +4,23 @@
 
 Bad:
 
-```
+```ts
 const environment = envConfig.environments.staging;
 const possibleGitProviders = ['gitlab', 'github', 'bitbucket'];
 
 let page: Login;
 let spacePage: Space;
-let pageTitle: string;
-let recordsWithData: Array<Record<string, string>>;
 
 const CommonFn = new Common();
 const testedComponent = 'myComponent';
+
+let pageTitle: string;
+let recordsWithData: Array<Record<string, string>>;
 ```
 
 Good:
 
-```
+```ts
 const environment = envConfig.environments.staging;
 const possibleGitProviders = ['gitlab', 'github', 'bitbucket'];
 const CommonFn = new Common();
@@ -35,37 +36,30 @@ let recordsWithData: Array<Record<string, string>>;
 
 Bad:
 
-```
-pageTitle = CommonFn.pageTitle;
+```ts
+const pageTitle = CommonFn.pageTitle;
 
-const uiDialog = await createNewPage.activateComponent(testedComponent, 'click');
+await createNewPage.activateComponent(testedComponent, 'click');
 
 const fixture = fixtures.get(1);
 
 await uiDialog.switchToTab('RemoteURL');
-
-const gitRepo = new GitRepo(gitProvider, envConfig.gitServices);
-
-await uiDialog.insertURL(gitRepo.fileUrl(fixture.input().name, false));
 ```
 
 Good:
-```
-pageTitle = CommonFn.pageTitle;
+```ts
+const pageTitle = CommonFn.pageTitle;
 const fixture = fixtures.get(1);
-const gitRepo = new GitRepo(gitProvider, envConfig.gitServices);
 
-const uiDialog = await createNewPage.activateComponent(testedComponent, 'click');
+await createNewPage.activateComponent(testedComponent, 'click');
 await uiDialog.switchToTab('RemoteURL');
-await uiDialog.insertURL(gitRepo.fileUrl(fixture.input().name, false));
 ```
 
 ## If you need to prepare more data during test flow, group them together
 
 Bad:
-```
+```ts
 (...)
-
 await uiDialog.switchToTab('RemoteURL');
 expect(await confluencePage.getText(testedComponent)).toBe(fixture.output().content);
 
@@ -73,22 +67,23 @@ const gitRepo = new GitRepo(gitProvider, envConfig.gitServices);
 
 await uiDialog.insertURL(gitRepo.fileUrl(tabsInputOutputFiles[2].fixture.input().name, false));
 
-selectedTab = faker.helpers.arrayElement(tabsInputOutputFiles);
+const selectedTab = faker.helpers.arrayElement(tabsInputOutputFiles);
 
 await createNewPage.insertSaveComponent('insert', uiDialog, testedComponent);
 ```
 
 Good:
-```
+```ts
+(...)
 await uiDialog.switchToTab('RemoteURL');
 expect(await confluencePage.getText(testedComponent)).toBe(fixture.output().content);
 
-// Data preparation step later in the game
 const gitRepo = new GitRepo(gitProvider, envConfig.gitServices);
-selectedTab = faker.helpers.arrayElement(tabsInputOutputFiles);
+const selectedTab = faker.helpers.arrayElement(tabsInputOutputFiles);
 
 await uiDialog.insertURL(gitRepo.fileUrl(tabsInputOutputFiles[2].fixture.input().name, false));
 await createNewPage.insertSaveComponent('insert', uiDialog, testedComponent);
+
 ```
 
 
@@ -99,45 +94,45 @@ await createNewPage.insertSaveComponent('insert', uiDialog, testedComponent);
 
 Bad:
 
-```
-await uiDialog.editURL(gitRepo.fileUrl(url));
+```ts
+await uiDialog.editURL(url);
 expect(await confluencePage.getText(testedComponent)).toBe(expected);
 await uiDialog.useAndCheckPreview(fixture.output().content, false, testedComponent);
 await createNewPage.insertSaveComponent('save', uiDialog, testedComponent);
 expect(await confluencePage.getText(testedComponent)).toBe(expected);
-const confluencePage = await createNewPage.publish();
+await createNewPage.publish();
 ```
 
 Good:
-```
-await uiDialog.editURL(url));
+```ts
+await uiDialog.editURL(url);
 expect(await confluencePage.getText(testedComponent)).toBe(expected);
 
 await uiDialog.useAndCheckPreview(fixture.output().content, false, testedComponent);
 await createNewPage.insertSaveComponent('save', uiDialog, testedComponent);
 expect(await confluencePage.getText(testedComponent)).toBe(expected);
 
-const confluencePage = await createNewPage.publish();
+await createNewPage.publish();
 ```
 
 
 ## Add line break when switching between data preparation and step execution
 
 Bad:
-```
+```ts
 await confluencePage.editPage();
-uiDialog = await createNewPage.editComponent('RemoteURL', testedComponent);
-gitRepo = new GitRepo(secondGitProvider, envConfig.gitServices);
+const uiDialog = "component";
+const gitRepo = new GitRepo(secondGitProvider, envConfig.gitServices);
 await uiDialog.editURL(gitRepo.fileUrl(fixtures.get(2).input().name, false));
 ```
 
 
 Good:
-```
+```ts
 await confluencePage.editPage();
-uiDialog = await createNewPage.editComponent('RemoteURL', testedComponent);
 
-gitRepo = new GitRepo(secondGitProvider, envConfig.gitServices);
+const uiDialog = "component";
+const gitRepo = new GitRepo(secondGitProvider, envConfig.gitServices);
 
 await uiDialog.editURL(gitRepo.fileUrl(fixtures.get(2).input().name, false));
 ```
@@ -147,7 +142,7 @@ await uiDialog.editURL(gitRepo.fileUrl(fixtures.get(2).input().name, false));
 Sometimes it is not possible to prepare all data in the beginning of the test. In that case, prepare new data after assertion
 
 Bad:
-```
+```ts
 const fixture1 = fixtures.get(1);
 
 await uiDialog.insertURL(gitRepo.fileUrl(fixture1.input().name, false));
@@ -157,12 +152,11 @@ const fixture2 = fixtures.get(2);
 expect(await confluencePage.getText(testedComponent)).toBe(expectedOutput);
 
 await uiDialog.insertURL(gitRepo.fileUrl(fixture2.input().name, false));
-
 ```
 
 
 Good:
-```
+```ts
 const fixture1 = fixtures.get(1);
 
 await uiDialog.insertURL(gitRepo.fileUrl(fixture1.input().name, false));
